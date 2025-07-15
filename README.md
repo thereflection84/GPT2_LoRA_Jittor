@@ -125,6 +125,10 @@ class LoRALinear(nn.Module):
 
 ![lora_training_curves](lora_training_curves.png)
 
+在 pytorch 环境下的结果对齐情况：
+
+![lora_training_curves_pytorch](lora_training_curves_pytorch.png)
+
 ---
 
 ## 参考资料
