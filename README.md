@@ -121,13 +121,7 @@ class LoRALinear(nn.Module):
 
 ### 损失曲线可视化
 
-保存训练时损失的 txt 文件后运行：
-
-```bash
-python plot_loss.py
-```
-
-输出图示（这里由于笔记本电脑显存不足，因此用的只是部分数据集训练，效果并不算很好）：
+保存训练时损失的 txt 文件，并由 plot_loss.py 生成输出图示（这里由于笔记本电脑显存不足，因此用的只是部分数据集训练，效果并不算很好）：
 
 ![lora_training_curves](lora_training_curves.png)
 
