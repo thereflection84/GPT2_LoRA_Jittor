@@ -19,6 +19,7 @@ GPT2_LoRA_Jittor/
 ├── plot_loss.py                 # 绘制训练过程损失曲线
 ├── model_utils.py               # 回答生成数据加载与评估模块
 ├── checkpoints/                 # 保存模型权重及log目录
+├── lora_pytorch/                # 用于验证对齐结果的pytorch环境代码实现
 └── README.md
 ```
 
@@ -125,7 +126,7 @@ class LoRALinear(nn.Module):
 
 ![lora_training_curves](lora_training_curves.png)
 
-在 pytorch 环境下的结果对齐情况：
+在 pytorch 环境下的结果对齐情况如下图所示，可以看到在相同数据集情况下，损失函数曲线趋势几乎一致，验证结果对齐，复现完毕：
 
 ![lora_training_curves_pytorch](lora_training_curves_pytorch.png)
 
