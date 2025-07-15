@@ -1,8 +1,6 @@
-# GPT2_LoRA_Jittor
+# 🤖 GPT2_LoRA_Jittor
 
-# 🤖 Jittor-LoRA-GPT2
-
-本项目基于 [Jittor](https://github.com/Jittor/jittor) 框架，复现并实现了 GPT2 模型的 LoRA（Low-Rank Adaptation）微调方法，支持中文与英文任务的训练与推理。
+本项目基于 [Jittor](https://github.com/Jittor/jittor) 框架，在经典英文问答数据集 [SQuAD v1.1](https://rajpurkar.github.io/SQuAD-explorer/) 上对 [GPT2](https://github.com/openai/gpt-2) 进行 LoRA 微调，验证其理解与抽取能力复现并实现了 GPT2 模型的 LoRA（Low-Rank Adaptation）微调方法，支持中文与英文任务的训练与推理。
 
 > 🔬 本项目旨在验证 LoRA 微调技术在 Jittor 框架下的可行性与高效性，提供完整的训练、推理和可视化支持。
 
