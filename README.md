@@ -18,7 +18,7 @@ GPT2_LoRA_Jittor/
 ├── test_generation.py           # 主测试脚本
 ├── plot_loss.py                 # 绘制训练过程损失曲线
 ├── model_utils.py               # 回答生成数据加载与评估模块
-├── checkpoints/                 # 训练日志目录
+├── checkpoints/                 # 保存模型权重及log目录
 └── README.md
 ```
 
