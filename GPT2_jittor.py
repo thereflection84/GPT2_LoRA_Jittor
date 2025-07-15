@@ -5,10 +5,9 @@ import numpy as np
 from dataclasses import dataclass
 import os
 
-# 使用 dataclass 装饰器，方便构建只包含数据的类
 @dataclass
 class GPTConfig:
-    block_size: int = 1024	# 最大文本长度，即 seq_len 的最大值
+    block_size: int = 1024
     vocab_size: int = 50257
     n_layer: int = 12
     n_head: int = 12
@@ -31,7 +30,7 @@ class GPT(nn.Module):
         # 语言模型头
         self.lm_head = nn.Linear(config.n_embed, config.vocab_size, bias=False)
 
-        # 设定词嵌入矩阵与分类器权重共享
+        # 权重共享
         self.lm_head.weight = self.transformer_wte.weight
 
     def execute(self, x, targets=None):
@@ -305,25 +304,3 @@ def generate_text(model, tokenizer, prompt, max_new_tokens=50, temperature=0.8, 
     
     # 解码生成的文本
     return tokenizer.decode(input_ids)
-
-
-if __name__ == "__main__":
-    from transformers import GPT2Tokenizer
-    
-    # 加载模型和分词器
-    model = GPT.from_pretrained('./local_gpt2')
-    tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
-    
-    # 测试生成文本
-    prompts = [
-        "Hello, I'm a language model,",
-        "The meaning of life is",
-        "Once upon a time in a galaxy far, far away",
-        "The best way to learn programming is"
-    ]
-    
-    for prompt in prompts:
-        generated = generate_text(model, tokenizer, prompt, max_new_tokens=30)
-        print(f"\n输入: {prompt}")
-        print(f"输出: {generated}")
-        print("-" * 50)
