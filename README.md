@@ -29,6 +29,7 @@ GPT2_LoRA_Jittor/
 - Jittor ≥ 1.3.7.0（建议 GPU 版本）
 - Transformers（用于加载 GPT2 tokenizer 和预训练权重）
 - 其他依赖：`tqdm`, `numpy`, `matplotlib`
+- 具体参考 requirement.txt
 
 ### 安装命令
 
@@ -60,8 +61,9 @@ python train_default_lora.py
 ### 查看生成文本
 
 ```
-输入提示词：人工智能
-生成结果：人工智能正在改变人类的生活方式，在医疗、教育和交通等领域展现巨大潜力……
+Context: Low-Rank Adaptation (LoRA) is a parameter-efficient fine-tuning technique that works by freezing the pre-trained model weights and injecting trainable low-rank matrices into each layer of the Transformer architecture, greatly reducing the number of trainable parameters for downstream tasks.
+Question: What is the main purpose of LoRA?
+Answer: The main objective of the process is to reduce the number of repetitions required to create a realistic human model. This reduces the number of repetitions required to create a realistic model from 1,200 to 1,500 repetitions in the current study.
 ```
 
 ---
@@ -118,7 +120,7 @@ class LoRALinear(nn.Module):
 
 ### 损失曲线可视化
 
-保存训练时损失的 loss.txt 文件后运行：
+保存训练时损失的 txt 文件后运行：
 
 ```bash
 python plot_loss.py
@@ -126,7 +128,7 @@ python plot_loss.py
 
 输出图示：
 
-![loss curve](./images/loss_curve.png)
+![lora_training_curves](.lora_training_curves.png)
 
 ---
 
