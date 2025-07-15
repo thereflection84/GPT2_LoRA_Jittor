@@ -1,6 +1,6 @@
 # GPT2_LoRA_Jittor
 
-本项目基于 [Jittor](https://github.com/Jittor/jittor) 框架，在经典英文问答数据集 [SQuAD v1.1](https://rajpurkar.github.io/SQuAD-explorer/) 上对 [GPT2](https://github.com/openai/gpt-2) 进行 LoRA 微调，在部分数据集的情况下验证其理解能力复现并实现了 GPT2 模型的 LoRA（Low-Rank Adaptation）微调方法，支持中文与英文任务的训练与推理。
+本项目基于 [Jittor](https://github.com/Jittor/jittor) 框架，在经典英文问答数据集 [SQuAD v1.1](https://rajpurkar.github.io/SQuAD-explorer/) 上对 [GPT2](https://github.com/openai/gpt-2) 进行 LoRA 微调，在部分数据集的情况下验证其理解能力复现并实现了 GPT2 模型的 LoRA（Low-Rank Adaptation）微调方法，支持英文任务的训练与推理。
 
 >  本项目旨在验证 LoRA 微调技术在 Jittor 框架下的可行性与高效性，提供完整的训练、推理和可视化支持。
 
@@ -15,8 +15,9 @@ GPT2_LoRA_Jittor/
 ├── lora_models.py               # 包含LoRA应用于GPT2的模型实现
 ├── gpt2_lora_dataset.py         # 数据集预处理与加载
 ├── train_default_lora.py        # 主训练脚本（支持训练与测试）
+├── test_generation.py           # 主测试脚本
 ├── plot_loss.py                 # 绘制训练过程损失曲线
-├── config/                      # 可选的模型配置文件目录
+├── model_utils.py               # 回答生成数据加载与评估模块
 ├── checkpoints/                 # 保存模型权重的目录
 └── README.md
 ```
@@ -126,7 +127,7 @@ class LoRALinear(nn.Module):
 python plot_loss.py
 ```
 
-输出图示：
+输出图示（这里由于笔记本电脑显存不足，因此用的只是部分数据集训练，效果并不算很好）：
 
 ![lora_training_curves](lora_training_curves.png)
 
