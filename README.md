@@ -1,4 +1,4 @@
-# 🤖 GPT2_LoRA_Jittor
+# GPT2_LoRA_Jittor
 
 本项目基于 [Jittor](https://github.com/Jittor/jittor) 框架，在经典英文问答数据集 [SQuAD v1.1](https://rajpurkar.github.io/SQuAD-explorer/) 上对 [GPT2](https://github.com/openai/gpt-2) 进行 LoRA 微调，在部分数据集的情况下验证其理解能力复现并实现了 GPT2 模型的 LoRA（Low-Rank Adaptation）微调方法，支持中文与英文任务的训练与推理。
 
@@ -6,11 +6,11 @@
 
 ---
 
-## 📁 项目结构
+## 项目结构
 
 ```
-jittor_lora_gpt2/
-├── GPT2_ji.py                   # GPT2 模型结构（Block, Attention, Feedforward 等）
+GPT2_LoRA_Jittor/
+├── GPT2_jittor.py               # GPT2 模型结构（Block, Attention, Feedforward 等）
 ├── LoRA.py                      # LoRA 插入模块，支持低秩适配
 ├── tokenizer_loader.py          # Tokenizer 加载模块（兼容 Huggingface）
 ├── dataset_loader.py            # 数据集预处理与加载（支持中英文）
@@ -38,7 +38,6 @@ pip install transformers==4.30.0
 pip install matplotlib tqdm numpy
 ```
 
-> 💡 请确保你正确安装了 GPU 版 Jittor，参考官网安装说明：[https://cg.cs.tsinghua.edu.cn/jittor/install](https://cg.cs.tsinghua.edu.cn/jittor/install)
 
 ---
 
