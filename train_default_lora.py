@@ -198,7 +198,7 @@ if __name__ == "__main__":
     # 训练默认LoRA模型
     model, train_losses, val_losses = train_default_lora(
         base_model_path='./local_gpt2',
-        data_path='./data/processed_squad_1000.json',
+        data_path='./data/processed_squad_100.json',
         output_dir='./checkpoints/default_lora',
         lora_r=8,
         lora_alpha=16,
