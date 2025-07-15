@@ -23,7 +23,7 @@ GPT2_LoRA_Jittor/
 
 ---
 
-## 🔧 环境依赖
+## 环境依赖
 
 - Python ≥ 3.8
 - Jittor ≥ 1.3.7.0（建议 GPU 版本）
@@ -41,7 +41,7 @@ pip install matplotlib tqdm numpy
 
 ---
 
-## 🚀 快速开始
+## 快速开始
 
 ### 1️⃣ 准备 GPT2 Tokenizer 与预训练模型
 
@@ -51,13 +51,13 @@ GPT2Tokenizer.from_pretrained("gpt2").save_pretrained("./gpt2")
 GPT2Model.from_pretrained("gpt2").save_pretrained("./gpt2")
 ```
 
-### 2️⃣ 运行微调脚本
+### 运行微调脚本
 
 ```bash
 python GPT2_LoRA_Full_Experiment.py
 ```
 
-### 3️⃣ 查看生成文本
+### 查看生成文本
 
 ```
 输入提示词：人工智能
@@ -66,7 +66,7 @@ python GPT2_LoRA_Full_Experiment.py
 
 ---
 
-## 🧠 LoRA 模块机制简介
+## LoRA 模块机制简介
 
 LoRA 是一种低秩矩阵近似微调方法，可减少参数更新量并加快训练速度。本项目中 LoRA 应用于 GPT2 的 Attention 子层。
 
@@ -89,7 +89,7 @@ self.q_proj = LoRAInjectedLinear(original_q_proj)
 
 ---
 
-## 📊 实验结果示例
+## 实验结果示例
 
 | Epoch | Loss  | Perplexity |
 |-------|-------|------------|
@@ -97,7 +97,7 @@ self.q_proj = LoRAInjectedLinear(original_q_proj)
 |   2   | 1.95  | 7.03       |
 |   3   | 1.52  | 4.58       |
 
-### 📈 损失曲线可视化
+### 损失曲线可视化
 
 保存训练时损失的 loss.txt 文件后运行：
 
@@ -111,37 +111,10 @@ python plot_loss.py
 
 ---
 
-## 📚 参考资料
+## 参考资料
 
 - 🔖 [LoRA: Low-Rank Adaptation of Large Language Models](https://arxiv.org/abs/2106.09685)
 - 🔖 [Jittor: A Novel Deep Learning Framework](https://github.com/Jittor/jittor)
 - 🔖 [Huggingface Transformers](https://huggingface.co/docs/transformers)
 
 ---
-
-## 📎 引用本项目
-
-如果你在学术或工程项目中使用了本项目，请引用：
-
-```bibtex
-@misc{jittor-lora-gpt2,
-  author = {Your Name},
-  title = {Jittor Implementation of LoRA on GPT2},
-  year = {2025},
-  howpublished = {\url{https://github.com/yourname/jittor-lora-gpt2}}
-}
-```
-
----
-
-## 🤝 贡献方式
-
-欢迎贡献代码、改进文档或报告问题：
-
-```bash
-# fork 仓库后提交 PR
-git clone https://github.com/yourname/jittor-lora-gpt2.git
-```
-
-欢迎 star ⭐ 本项目以示鼓励！
-```
