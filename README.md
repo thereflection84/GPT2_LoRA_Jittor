@@ -19,7 +19,7 @@ GPT2_LoRA_Jittor/
 ├── plot_loss.py                 # 绘制训练过程损失曲线
 ├── model_utils.py               # 回答生成数据加载与评估模块
 ├── checkpoints/                 # 保存模型权重及log目录
-├── lora_pytorch/                # 用于验证对齐结果的pytorch环境代码实现
+├── lora_pytorch/                # 用于验证对齐结果的pytorch环境代码实现，仅展示实现代码，其中预训练模型权重与数据集载入同Jittor载入函数一致
 └── README.md
 ```
 
@@ -37,7 +37,7 @@ GPT2_LoRA_Jittor/
 
 ```bash
 conda create -n env python=3.9
-conda activate env  # 必须激活环境！
+conda activate env  # 激活环境
 conda install jittor=1.3.7.0 transformers=4.53.0 matplotlib tqdm numpy -c conda-forge
 ```
 
@@ -72,7 +72,7 @@ Answer: The main objective of the process is to reduce the number of repetitions
 
 ## LoRA 模块机制简介
 
-LoRA 是一种低秩矩阵近似微调方法，可减少参数更新量并加快训练速度。本项目中 LoRA 应用于 GPT2 的 Attention 子层与前馈网络层。
+LoRA 是一种低秩矩阵近似微调方法，可减少参数更新量并加快训练速度，本项目中 LoRA 主要应用于 GPT2 的 Attention 子层与前馈网络层。
 
 ```python
 class LoRALinear(nn.Module):
