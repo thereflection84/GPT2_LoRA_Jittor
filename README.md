@@ -135,8 +135,8 @@ python plot_loss.py
 
 ## 参考资料
 
-- 🔖 [LoRA: Low-Rank Adaptation of Large Language Models](https://arxiv.org/abs/2106.09685)
-- 🔖 [Jittor: A Novel Deep Learning Framework](https://github.com/Jittor/jittor)
-- 🔖 [Huggingface Transformers](https://huggingface.co/docs/transformers)
+-  [LoRA: Low-Rank Adaptation of Large Language Models](https://arxiv.org/abs/2106.09685)
+-  [Jittor: A Novel Deep Learning Framework](https://github.com/Jittor/jittor)
+-  [Huggingface Transformers](https://huggingface.co/docs/transformers)
 
 ---
