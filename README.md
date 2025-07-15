@@ -11,10 +11,10 @@
 ```
 GPT2_LoRA_Jittor/
 ├── GPT2_jittor.py               # GPT2 模型结构（Block, Attention, Feedforward 等）
-├── LoRA.py                      # LoRA 插入模块，支持低秩适配
-├── tokenizer_loader.py          # Tokenizer 加载模块（兼容 Huggingface）
-├── dataset_loader.py            # 数据集预处理与加载（支持中英文）
-├── GPT2_LoRA_Full_Experiment.py # 主训练脚本（支持训练与测试）
+├── LoRA.py                      # 包含LoRA核心实现
+├── lora_models.py               # 包含LoRA应用于GPT2的模型实现
+├── gpt2_lora_dataset.py         # 数据集预处理与加载
+├── train_default_lora.py        # 主训练脚本（支持训练与测试）
 ├── plot_loss.py                 # 绘制训练过程损失曲线
 ├── config/                      # 可选的模型配置文件目录
 ├── checkpoints/                 # 保存模型权重的目录
@@ -54,7 +54,7 @@ GPT2Model.from_pretrained("gpt2").save_pretrained("./gpt2")
 ### 运行微调脚本
 
 ```bash
-python GPT2_LoRA_Full_Experiment.py
+python train_default_lora.py
 ```
 
 ### 查看生成文本
@@ -68,34 +68,53 @@ python GPT2_LoRA_Full_Experiment.py
 
 ## LoRA 模块机制简介
 
-LoRA 是一种低秩矩阵近似微调方法，可减少参数更新量并加快训练速度。本项目中 LoRA 应用于 GPT2 的 Attention 子层。
+LoRA 是一种低秩矩阵近似微调方法，可减少参数更新量并加快训练速度。本项目中 LoRA 应用于 GPT2 的 Attention 子层与前馈网络层。
 
 ```python
 class LoRALinear(nn.Module):
-    def __init__(self, in_features, out_features, r=4, alpha=32):
+    def __init__(self, in_features, out_features, r=8, lora_alpha=16, lora_dropout=0.1):
+        super().__init__()
+
+        # 冻结原始权重和偏置
+        self.weight = jt.init.gauss((out_features, in_features), 'float32', std=0.02)
+        self.weight.requires_grad = False
+
+        self.bias = jt.zeros(out_features)
+        self.bias.requires_grad = False
+
+        # LoRA 子层（低秩分解）
         self.lora_A = nn.Linear(in_features, r, bias=False)
         self.lora_B = nn.Linear(r, out_features, bias=False)
-        self.scaling = alpha / r
+
+        # 初始化
+        self.lora_A.weight = jt.init.gauss(self.lora_A.weight.shape, 'float32', std=1.0/r)
+        self.lora_B.weight = jt.zeros(self.lora_B.weight.shape)
+
+        self.scaling = lora_alpha / r
+        self.lora_dropout = nn.Dropout(p=lora_dropout)
+
     def execute(self, x):
-        return self.lora_B(self.lora_A(x)) * self.scaling
+        # 原始权重路径（冻结）
+        out = jt.matmul(x, self.weight.t()) + self.bias
+        # LoRA 路径（可训练）
+        out += self.lora_B(self.lora_A(self.lora_dropout(x))) * self.scaling
+        return out
 ```
 
 注入方式：
 
 ```python
-# 替换原始 Q/K/V 层为 LoRA 注入层
-self.q_proj = LoRAInjectedLinear(original_q_proj)
+# 替换原始 多头注意力层 为 LoRA 注入层
+ self.attn = LoRACausalSelfAttention(
+                config, 
+                lora_config, 
+                original_c_attn=original_c_attn,
+                original_c_proj=original_c_proj
+            )
 ```
 
 ---
 
-## 实验结果示例
-
-| Epoch | Loss  | Perplexity |
-|-------|-------|------------|
-|   1   | 2.63  | 13.9       |
-|   2   | 1.95  | 7.03       |
-|   3   | 1.52  | 4.58       |
 
 ### 损失曲线可视化
 
