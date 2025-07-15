@@ -33,9 +33,9 @@ GPT2_LoRA_Jittor/
 ### 安装命令
 
 ```bash
-pip install jittor==1.3.7.0
-pip install transformers==4.30.0
-pip install matplotlib tqdm numpy
+conda create -n env python=3.9
+conda activate env  # 必须激活环境！
+conda install jittor=1.3.7.0 transformers=4.53.0 matplotlib tqdm numpy -c conda-forge
 ```
 
 
@@ -43,7 +43,7 @@ pip install matplotlib tqdm numpy
 
 ## 快速开始
 
-### 1️⃣ 准备 GPT2 Tokenizer 与预训练模型
+### 准备 GPT2 Tokenizer 与预训练模型
 
 ```python
 from transformers import GPT2Tokenizer, GPT2Model
