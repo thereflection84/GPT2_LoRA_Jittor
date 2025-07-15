@@ -128,7 +128,7 @@ python plot_loss.py
 
 输出图示：
 
-![lora_training_curves](.lora_training_curves.png)
+![lora_training_curves](lora_training_curves.png)
 
 ---
 
