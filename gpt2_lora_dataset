@@ -1,0 +1,194 @@
+import json
+import os
+import argparse
+import numpy as np
+from tqdm import tqdm
+import requests
+from transformers import GPT2Tokenizer
+
+
+def download_squad_dataset(version="v1.1", save_dir="./data"):
+    """
+    下载SQuAD数据集
+    
+    参数:
+    - version: 数据集版本，可选"v1.1"或"v2.0"
+    - save_dir: 保存目录
+    
+    返回:
+    - train_file: 训练集文件路径
+    - dev_file: 开发集文件路径
+    """
+    os.makedirs(save_dir, exist_ok=True)
+    
+    # 定义URL
+    base_url = "https://rajpurkar.github.io/SQuAD-explorer/dataset"
+    train_url = f"{base_url}/train-{version}.json"
+    dev_url = f"{base_url}/dev-{version}.json"
+    
+    # 定义文件路径
+    train_file = os.path.join(save_dir, f"train-{version}.json")
+    dev_file = os.path.join(save_dir, f"dev-{version}.json")
+    
+    # 下载训练集
+    if not os.path.exists(train_file):
+        print(f"下载SQuAD {version}训练集...")
+        response = requests.get(train_url, stream=True)
+        response.raise_for_status()
+        
+        total_size = int(response.headers.get('content-length', 0))
+        block_size = 1024
+        progress_bar = tqdm(total=total_size, unit='iB', unit_scale=True)
+        
+        with open(train_file, 'wb') as f:
+            for data in response.iter_content(block_size):
+                progress_bar.update(len(data))
+                f.write(data)
+        
+        progress_bar.close()
+        print(f"SQuAD {version}训练集已保存至: {train_file}")
+    else:
+        print(f"SQuAD {version}训练集已存在: {train_file}")
+    
+    # 下载开发集
+    if not os.path.exists(dev_file):
+        print(f"下载SQuAD {version}开发集...")
+        response = requests.get(dev_url, stream=True)
+        response.raise_for_status()
+        
+        total_size = int(response.headers.get('content-length', 0))
+        block_size = 1024
+        progress_bar = tqdm(total=total_size, unit='iB', unit_scale=True)
+        
+        with open(dev_file, 'wb') as f:
+            for data in response.iter_content(block_size):
+                progress_bar.update(len(data))
+                f.write(data)
+        
+        progress_bar.close()
+        print(f"SQuAD {version}开发集已保存至: {dev_file}")
+    else:
+        print(f"SQuAD {version}开发集已存在: {dev_file}")
+    
+    return train_file, dev_file
+
+
+def process_squad_data(input_file, output_file, max_samples=None, max_seq_length=1024, tokenizer_name="gpt2"):
+    """
+    处理SQuAD数据集，将其转换为适合GPT2-LoRA微调的格式
+    
+    参数:
+    - input_file: SQuAD数据集文件路径
+    - output_file: 输出文件路径
+    - max_samples: 最大样本数，如果为None则处理所有样本
+    - max_seq_length: 最大序列长度
+    - tokenizer_name: 分词器名称
+    """
+    print(f"正在加载SQuAD数据集: {input_file}")
+    with open(input_file, 'r', encoding='utf-8') as f:
+        squad_data = json.load(f)
+    
+    # 加载分词器
+    print(f"加载分词器: {tokenizer_name}")
+    tokenizer = GPT2Tokenizer.from_pretrained(tokenizer_name)
+    
+    # 如果分词器没有EOS和PAD token，添加它们
+    special_tokens = {}
+    if tokenizer.pad_token is None:
+        special_tokens["pad_token"] = "[PAD]"
+    if tokenizer.eos_token is None:
+        special_tokens["eos_token"] = "[EOS]"
+    
+    if special_tokens:
+        tokenizer.add_special_tokens(special_tokens)
+    
+    # 处理数据
+    print("处理数据...")
+    processed_data = {"train": [], "val": []}
+    
+    # 计数器
+    sample_count = 0
+    
+    # 遍历SQuAD数据
+    for article in tqdm(squad_data["data"]):
+        for paragraph in article["paragraphs"]:
+            context = paragraph["context"]
+            
+            for qa in paragraph["qas"]:
+                question = qa["question"]
+                
+                # 如果有多个答案，只取第一个
+                if qa["answers"]:
+                    answer = qa["answers"][0]["text"]
+                    
+                    # 构建输入格式: "Context: ... Question: ... Answer: ..."
+                    input_text = f"Context: {context}\nQuestion: {question}\nAnswer: {answer}"
+                    
+                    # 分词
+                    tokens = tokenizer.encode(input_text)
+                    
+                    # 如果序列太长，截断
+                    if len(tokens) > max_seq_length:
+                        tokens = tokens[:max_seq_length]
+                    
+                    # 添加到处理后的数据
+                    if sample_count % 10 == 0:  # 10%的数据作为验证集
+                        processed_data["val"].append({"tokens": tokens})
+                    else:
+                        processed_data["train"].append({"tokens": tokens})
+                    
+                    sample_count += 1
+                    
+                    # 如果达到最大样本数，停止处理
+                    if max_samples is not None and sample_count >= max_samples:
+                        break
+            
+            if max_samples is not None and sample_count >= max_samples:
+                break
+                
+        if max_samples is not None and sample_count >= max_samples:
+            break
+    
+    # 保存处理后的数据
+    print(f"保存处理后的数据到: {output_file}")
+    print(f"总共处理了 {sample_count} 个样本")
+    print(f"训练集: {len(processed_data['train'])} 个样本")
+    print(f"验证集: {len(processed_data['val'])} 个样本")
+    
+    with open(output_file, 'w', encoding='utf-8') as f:
+        json.dump(processed_data, f, ensure_ascii=False, indent=2)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="处理SQuAD数据集为GPT2-LoRA微调格式")
+    parser.add_argument("--input", type=str, default=None, help="输入SQuAD数据集文件路径，如果不指定则自动下载")
+    parser.add_argument("--output", type=str, default="./data/processed_squad_full.json", help="输出文件路径")
+    parser.add_argument("--max_samples", type=int, default=None, help="最大样本数，默认为None处理所有样本")
+    parser.add_argument("--max_seq_length", type=int, default=1024, help="最大序列长度，默认为1024")
+    parser.add_argument("--tokenizer", type=str, default="gpt2", help="分词器名称，默认为gpt2")
+    parser.add_argument("--squad_version", type=str, default="v1.1", choices=["v1.1", "v2.0"], help="SQuAD数据集版本，默认为v1.1")
+    parser.add_argument("--download", action="store_true", help="强制下载数据集，即使本地已存在")
+    
+    args = parser.parse_args()
+    
+    # 创建输出目录（如果不存在）
+    os.makedirs(os.path.dirname(args.output), exist_ok=True)
+    
+    # 如果未指定输入文件或强制下载，则下载数据集
+    input_file = args.input
+    if input_file is None or args.download:
+        train_file, dev_file = download_squad_dataset(version=args.squad_version, save_dir="./data")
+        input_file = train_file  # 默认使用训练集
+    
+    # 处理数据
+    process_squad_data(
+        input_file, 
+        args.output, 
+        max_samples=args.max_samples, 
+        max_seq_length=args.max_seq_length,
+        tokenizer_name=args.tokenizer
+    )
+
+
+if __name__ == "__main__":
+    main() 
