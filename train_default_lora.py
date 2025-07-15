@@ -22,7 +22,7 @@ def train_default_lora(
     lora_r=8,
     lora_alpha=16,
     lora_dropout=0.1,
-    batch_size=4,
+    batch_size=1,  # 使用最小batch_size以减少内存使用
     learning_rate=5e-4,
     num_epochs=3,
     save_every=100,
@@ -113,6 +113,9 @@ def train_default_lora(
             # 反向传播
             optimizer.backward(loss)
             
+            # 使用jt.clean_graph()清理内存
+            jt.clean_graph()
+            
             # 在更新参数前检查梯度
             grad_percent = check_grads(model, optimizer, step, verbose=(step % 10 == 0))
             
@@ -123,6 +126,9 @@ def train_default_lora(
             # 更新参数
             optimizer.step()
             optimizer.zero_grad()
+            
+            # 再次清理内存
+            jt.clean_graph()
             
             # 记录损失
             loss_value = loss.item()
@@ -139,6 +145,9 @@ def train_default_lora(
                 val_losses.append(val_loss)
                 model.train()
                 print(f"Step {step}/{total_steps} - Val Loss: {val_loss:.4f}")
+                
+                # 验证后清理内存
+                jt.clean_graph()
             
             # 保存模型
             if step > 0 and step % save_every == 0:
@@ -149,6 +158,9 @@ def train_default_lora(
                 # 保存当前的训练损失
                 save_losses(train_losses, val_losses, output_dir)
                 
+                # 保存后清理内存
+                jt.clean_graph()
+                
             step += 1
                 
         # Epoch结束，计算平均损失
@@ -158,6 +170,9 @@ def train_default_lora(
         # 每个epoch结束保存一次
         save_path = os.path.join(output_dir, f"gpt2_lora_epoch_{epoch+1}.npz")
         model.save_lora_weights(save_path)
+        
+        # Epoch结束后清理内存
+        jt.clean_graph()
         
     # 训练结束，保存最终模型
     final_path = os.path.join(output_dir, "gpt2_lora_final.npz")
@@ -203,7 +218,7 @@ if __name__ == "__main__":
         lora_r=8,
         lora_alpha=16,
         lora_dropout=0.1,
-        batch_size=4,
+        batch_size=1,  # 使用最小batch_size以减少内存使用
         learning_rate=5e-4,
         num_epochs=3,
         save_every=100,
