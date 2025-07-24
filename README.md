@@ -18,6 +18,8 @@ GPT2_LoRA_Jittor/
 ├── test_generation.py           # 主测试脚本
 ├── plot_loss.py                 # 绘制训练过程损失曲线
 ├── model_utils.py               # 回答生成数据加载与评估模块
+├── download_nltk.py             # 下载自然语言处理工具包NLTK的资源为后续评估验证做准备
+├── model_evaluation.py          # 主评估脚本
 ├── checkpoints/                 # 保存模型权重及log目录
 ├── lora_pytorch/                # 用于验证对齐结果的pytorch环境代码实现，仅展示实现代码，其中预训练模型权重与数据集载入同Jittor载入函数一致
 └── README.md
@@ -129,6 +131,20 @@ class LoRALinear(nn.Module):
 在 pytorch 环境下的结果对齐情况如下图所示，可以看到在相同数据集情况下，损失函数曲线趋势几乎一致，验证结果对齐，复现完毕：
 
 ![lora_training_curves_pytorch](lora_training_curves_pytorch.png)
+
+---
+
+### 评估 LoRA 改进情况
+
+保存经过 LoRA 微调训练后的模型权重 gpt2_lora_final.npz 文件，并由 model_evaluation.py 对该模型进行评估，并与预训练模型进行比对，得到以下结果：
+
+在各评估指标与预训练模型得分情况对比：
+
+![model_comparison_chart](model_comparison_chart.png)
+
+提升百分比情况：
+
+![improvement_percentage_chart](improvement_percentage_chart.png)
 
 ---
 
